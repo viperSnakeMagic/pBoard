@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <main>
-    <h1><%= p.subject %></h1>
-    <p><%= (new Date(p.posted_at)) %></p>
-    <div>
+    <h1 id="s"><%= p.subject %></h1>
+    <p class="pd"><%= (new Date(p.created_at)) %></p>
+    <div class="c">
         <%- p.content %>
     </div>
 </main>

@@ -90,11 +90,13 @@ input, textarea {
     border: 1px solid black;
     padding: 0.25em;
     font-family:'Courier New', Courier, monospace;
+    font-size: 1rem;
     display: block;
     width: 100%;
 }
 
 form button {
+    padding: 0.25rem 0.5rem;
     display: block;
 }
 

@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<main>
+    <p>Posting to <b><%= p.t %>-board</b></p>
+    <form action="/<%= p.t %>/new" method="post">
+        <input type="text" id="subject" name="s" placeholder="subject">
+        <textarea id="content" name="c" placeholder="content"></textarea>
+        <button type="submit">submit</button>
+    </form>
+</main>

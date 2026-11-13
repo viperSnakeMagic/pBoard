@@ -1,0 +1,12 @@
+<main>
+    <h1><%= p.b %>-board</h1>
+    <ul>
+        <% p.posts.map(e => { %>
+            <li>
+                <a href="/post/<%= e.id %>"><%= e.subject %></a>
+                <p><%= (new Date(e.posted_at)) %></p>
+            </li>
+        <% }); %>
+    </ul>
+    <div><a href="/<%= p.b %>/<%= p.n - 1 %>">back</a><a href="/<%= p.b %>/<%= p.n + 1 %>">next</a><div>
+</main>

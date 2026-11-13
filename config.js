@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-process.loadEnvFile();
+if (process.env.NODE_ENV === "development") process.loadEnvFile();
 
 const pool = new Pool({
     host: process.env.DB_HOST,

@@ -2,7 +2,7 @@ import express from "express";
 import path from "node:path";
 import * as db from "./config.js";
 
-process.loadEnvFile();
+if (process.env.NODE_ENV === "development") process.loadEnvFile();
 
 const app = express();
 app.set("view engine", "ejs");

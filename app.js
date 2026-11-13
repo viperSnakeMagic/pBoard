@@ -62,7 +62,7 @@ app.listen(PORT, HOST, () => {
 
 async function getPosts(t,n) {
     try {
-        return (await db.q("SELECT * FROM p WHERE rel = $1 OFFSET $2 LIMIT 20;", [t, n])).rows; 
+        return (await db.q("SELECT * FROM p WHERE rel = $1 ORDER BY created_at DESC OFFSET $2 LIMIT 20;", [t, n])).rows; 
     } catch(err) {
         console.error(err);
         return [];

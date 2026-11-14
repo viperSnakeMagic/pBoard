@@ -1,18 +1,33 @@
 import express from "express";
 import path from "node:path";
 import * as db from "./config.js";
+import DOMPurify from "isomorphic-dompurify";
+import RateLimit from "express-rate-limit";
 
-if (process.env.NODE_ENV === "development") process.loadEnvFile();
+//process.loadEnvFile();
 
 const app = express();
 app.set("view engine", "ejs");
 
+const limit = RateLimit({
+    windowMs: 1000*60,
+    limit: 75,
+    legacyHeaders: false
+});
+
+const postLimit = RateLimit({
+    windowMs: 1000*60,
+    limit: 3,
+    legacyHeaders: false
+});
+
+app.use(limit);
 app.use(express.static(path.join(process.cwd(), "public")));
 app.use(express.urlencoded({extended: true}));
 
 app.get("/post/:id", async (req, res, next) => {
     let id = Number(req.params.id);
-    if (!(id !== NaN && id >= 0)) {
+    if (!(id !== NaN && id >= 0 && id === Math.floor(id))) {
         return next();
     }
     let post = (await db.q("SELECT * FROM p WHERE id = $1;", [id])).rows;
@@ -27,7 +42,8 @@ app.get("/:t/new", (req, res, next) => {
     res.render("index.ejs", {p:{t: req.params.t}, s: "form"});
 });
 
-app.post("/:t/new", async (req, res) => {
+app.post("/:t/new", postLimit, async (req, res) => {
+    req.body.c = DOMPurify.sanitize(req.body.c);
     await postNew(req.body, req.params.t);
     res.redirect("/a/0");
 });
@@ -40,12 +56,13 @@ app.get("/:t/:n", async (req, res, next) => {
     if (req.params.t !== "a" && req.params.t !== "b") {
         return next();
     }
-    if (!(Number(req.params.n) >= 0)) {
+    let n = Number(req.params.n);
+    if (!(n >= 0 && n === Math.floor(n))) {
         return res.redirect(`/${req.params.t}/0`);
     }
 
-    let posts = await getPosts(req.params.t, Number(req.params.n) * 20);
-    res.render("index.ejs", {p: {posts, b: req.params.t, n: Number(req.params.n)}, s: "main"});
+    let posts = await getPosts(req.params.t, n * 20);
+    res.render("index.ejs", {p: {posts, b: req.params.t, n: n}, s: "main"});
 });
 
 app.use((req, res) => {
@@ -71,6 +88,9 @@ async function getPosts(t,n) {
 
 async function postNew({s,c},r) {
     try {
+        if (!(s && c)) {
+            throw new Error("empty request");
+        }
         await  db.q("INSERT INTO p(subject, content, rel) VALUES($1, $2, $3);", [s, c, r]);
         console.log(`New post has been added: ${s}`);
     } catch(err) {
